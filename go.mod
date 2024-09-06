@@ -1,4 +1,4 @@
-module github.com/linhhdinh/redsync/redsync/v4
+module github.com/linhhdinh/redsync/v4
 
 go 1.22
 
