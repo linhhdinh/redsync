@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"fmt"
 	"time"
 
 	"github.com/go-redsync/redsync/v4/redis"
@@ -221,11 +222,13 @@ func genValue() (string, error) {
 func (m *Mutex) acquire(ctx context.Context, pool redis.Pool, value string) (bool, error) {
 	conn, err := pool.Get(ctx)
 	if err != nil {
+		fmt.Println("acquire() pool.Get(ctx) returns err", err)
 		return false, err
 	}
 	defer conn.Close()
 	reply, err := conn.SetNX(m.name, value, m.expiry)
 	if err != nil {
+		fmt.Println("acquire() conn.SetNX() returns err", err)
 		return false, err
 	}
 	return reply, nil
@@ -245,11 +248,13 @@ var deleteScript = redis.NewScript(1, `
 func (m *Mutex) release(ctx context.Context, pool redis.Pool, value string) (bool, error) {
 	conn, err := pool.Get(ctx)
 	if err != nil {
+		fmt.Println("acquire() pool.Get(ctx) returns err", err)
 		return false, err
 	}
 	defer conn.Close()
 	status, err := conn.Eval(deleteScript, m.name, value)
 	if err != nil {
+		fmt.Println("acquire() conn.Eval() returns err", err)
 		return false, err
 	}
 	if status == int64(-1) {
